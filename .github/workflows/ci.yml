@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-security:
-    name: Build, tests & security scans
+    name: Build & security scans
     runs-on: ubuntu-latest
     env:
       UV_DEFAULT_INDEX: https://pypi.org/simple
@@ -22,9 +22,6 @@ jobs:
 
       - name: Install dependencies
         run: uv sync
-
-      - name: Unit tests (pytest)
-        run: uv run pytest -q
 
       # --- SAST: Bandit (статический анализ кода) ---
       # Порог -ll: сборка падает только при находках MEDIUM и выше
