@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-security:
+    name: Build, tests & security scans
+    runs-on: ubuntu-latest
+    env:
+      UV_DEFAULT_INDEX: https://pypi.org/simple
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up uv + Python
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Unit tests (pytest)
+        run: uv run pytest -q
+
+      # --- SAST: Bandit (статический анализ кода) ---
+      # Порог -ll: сборка падает только при находках MEDIUM и выше
+      - name: SAST - Bandit
+        run: |
+          uv run bandit -r app -ll -f json -o bandit_report.json
+          echo "Bandit: no MEDIUM/HIGH severity issues found."
+
+      - name: Upload Bandit report (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit_report.json
+
+      # --- SCA: Safety (проверка зависимостей на известные уязвимости) ---
+      # Использует open-source базу уязвимостей, не требует API-ключа
+      - name: SCA - Safety
+        run: |
+          uv run safety check --short-report
+          echo "Safety: no known vulnerabilities in dependencies."
