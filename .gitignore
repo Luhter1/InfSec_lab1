@@ -1,0 +1,25 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# БД и локальные данные
+instance/
+*.db
+
+# Тесты и отчёты
+.pytest_cache/
+.bandit/
+*.xml
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Локальные служебные директории инструментов
+.nessy/
+
+# Локальные переменные окружения
+.env
